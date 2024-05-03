@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 from flask_sse import sse
 import time
 
@@ -28,3 +28,12 @@ def heavy_task_route():
     # Starting heavy task in a separate process
     heavy_task()
     return "Heavy task initiated."
+
+
+@app.route('/api/call_event', methods=['POST'])
+def call_event():
+    content = request.get_json()
+    text = content['text']
+    sse.publish({"message": text}, type='greeting')
+    app.logger.info(text)
+    return jsonify({"flask_response":"/api/call_event triggered", "text":text})
