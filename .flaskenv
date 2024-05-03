@@ -1,4 +1,4 @@
-FLASK_APP=microwebpage.py
+FLASK_APP=sse.py
 #FLASK_DEBUG=0
 FLASK_DEBUG=1
 FLASK_ENV=development
