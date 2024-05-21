@@ -1,5 +1,4 @@
-
-console.log("build.v003");
+console.log("build.v004");
 
 const sse = new EventSource("/api/v1/sse");
 sse.onopen = (event) => console.log("Connection opened")
@@ -8,23 +7,20 @@ sse.addEventListener("notice", (event) => {  console.log(event.data); });
 sse.addEventListener("update", (event) => {  console.log(event.data); });
 sse.onmessage = (event) => {
     console.log("message " + event.data);
-
-    document.getElementById("002").innerHTML = '(/api/v1/sse).... - ' + event.data + " Came at: - " + new Date().toISOString();
+    document.getElementById("001").innerHTML = '(/api/v1/sse) - ' + event.data + " Came at: - " + new Date().toISOString();
 }
 
-const ssestream = new EventSource("/api/v1/stream");
-ssestream.onopen = (event) => console.log("Connection opened")
-ssestream.onerror = (event) => console.log("Error:", event)
-ssestream.addEventListener("notice", (event) => {  console.log(event.data); });
-ssestream.addEventListener("update", (event) => {  console.log(event.data); });
-
-ssestream.onmessage = (event) => {
-    console.log("message " + event.data);
-
-    document.getElementById("003").innerHTML = '(/api/v1/stream)  - ' + event.data + " Came at: - " + new Date().toISOString();
-}
-
-
+//const ssestream = new EventSource("/api/v1/stream");
+//ssestream.onopen = (event) => console.log("Connection opened")
+//ssestream.onerror = (event) => console.log("Error:", event)
+//ssestream.addEventListener("notice", (event) => {  console.log(event.data); });
+//ssestream.addEventListener("update", (event) => {  console.log(event.data); });
+//
+//ssestream.onmessage = (event) => {
+//    console.log("message " + event.data);
+//
+//    document.getElementById("003").innerHTML = '(/api/v1/stream)  - ' + event.data + " Came at: - " + new Date().toISOString();
+//}
 
 
 //
@@ -45,7 +41,6 @@ ssestream.onmessage = (event) => {
 //    console.error("Error: postJSON >>>> fetch():", error);
 //  }
 //}
-
 
 
 function open_win() {
