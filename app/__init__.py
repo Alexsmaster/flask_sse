@@ -1,8 +1,10 @@
 from flask import Flask, request, render_template, url_for, jsonify, Response, redirect, send_file
 import logging
+from logging.handlers import SMTPHandler, RotatingFileHandler
 import time
 from datetime import datetime
-from announce import announcer, format_sse, json
+# from app import announce
+from app.announce import announcer, format_sse, json
 
 
 app = Flask(__name__)
@@ -10,8 +12,16 @@ app.config['DEBUG'] = True
 app.logger.setLevel(logging.INFO)
 app.logger.debug('DEBUG in root : 00 event')
 
+
 @app.route('/')
 def index():
+    app.logger.info('This is an INFO message')
+    app.logger.debug('This is a DEBUG message')
+    app.logger.warning('This is a WARNING message')
+    app.logger.error('This is an ERROR message')
+    app.logger.critical('This is a CRITICAL message')
+    app.logger.exception('An exception occurred during a request.')
+
     return render_template('index.html')
 
 
@@ -65,14 +75,6 @@ def apicall():
 
 
 
-# app.logger.info('This is an INFO message')
-# app.logger.debug('This is a DEBUG message')
-# app.logger.warning('This is a WARNING message')
-# app.logger.error('This is an ERROR message')
-# app.logger.critical('This is a CRITICAL message')
-# app.logger.exception('An exception occurred during a request.')
-
-
 
 
 # @app.route('/api/v1/stream')
@@ -93,3 +95,6 @@ def apicall():
 #         return Response(stream(), content_type='text/event-stream')
 #
 #     return redirect("/")
+
+if __name__ == '__main__':
+    app.run('0.0.0.0', 8000, debug=True)
