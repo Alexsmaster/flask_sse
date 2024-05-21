@@ -120,7 +120,7 @@ Flask-SSE==1.0.0
 gevent==23.9.1
 gunicorn==21.2.0
 click==8.0.3
-gevent==23.9.1
+
 itsdangerous==2.0.1
 Jinja2==3.0.3
 MarkupSafe==2.1.3

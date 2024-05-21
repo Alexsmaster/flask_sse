@@ -1,12 +1,12 @@
-console.log("build.v004");
+console.log("build.v006");
 
-const sse = new EventSource("/api/v1/sse");
+const sse = new EventSource("/api/sse");
 sse.onopen = (event) => console.log("Connection opened")
 sse.onerror = (event) => console.log("Error:", event)
 sse.addEventListener("notice", (event) => {  console.log(event.data); });
 sse.addEventListener("update", (event) => {  console.log(event.data); });
 sse.onmessage = (event) => {
-    console.log("message " + event.data);
+    console.log("Debug - JS: sse - onmessage: " + event.data);
     document.getElementById("001").innerHTML = '(/api/v1/sse) - ' + event.data + " Came at: - " + new Date().toISOString();
 }
 
@@ -23,24 +23,24 @@ sse.onmessage = (event) => {
 //}
 
 
-//
-//async function postJSON(url, data) {
-//  try {
-//    const response = await fetch(url, {
-//      method: "POST", // or 'PUT'
-//      headers: {
-//        "Content-Type": "application/json"
-//      },
-//      body: JSON.stringify({
-//        text: data
-//      }),
-//    });
-//    const result = await response.json();
-//    console.log("comment: postJSON >>>> fetch()", result);
-//  } catch (error) {
-//    console.error("Error: postJSON >>>> fetch():", error);
-//  }
-//}
+
+async function postJSON(url, data) {
+  try {
+    const response = await fetch(url, {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        text: data + new Date().toISOString()
+      }),
+    });
+    const result = await response.json();
+    console.log("Debug - JS: postJSON >>>> answer from server: ", result);
+  } catch (error) {
+    console.error("Debug - JS: postJSON >>>> error: ", error);
+  }
+}
 
 
 function open_win() {
