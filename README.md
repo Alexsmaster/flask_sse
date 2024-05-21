@@ -1,13 +1,17 @@
 # Flask_sse_websockets
-Semple websocket server for alerting clients with minimal delay.
+Sample server for alerting clients with minimal delay.
 
 
-If you are using a Redis server that has a password use:
+# Install
+git clone urlofthatrepo
+cd flask_sse
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-app.config["REDIS_URL"] = "redis://:password@localhost"
+# The Way to run that
+cd ~/PycharmProjects/Flask_sse/ && source .venv/bin/activate && gunicorn 'sse:app' --worker-class gevent -b 0.0.0.0:5000 --reload --access-logfile log.txt
+gunicorn 'sse:app'  --worker-class sync -b 0.0.0.0:5000 --reload --log-level debug --access-logfile log.txt 
 
-$ gunicorn sse:app --worker-class gevent --bind 127.0.0.1:8000
-Open your web browser, and visit 127.0.0.1:8000.  
+Open your web browser, and visit 127.0.0.1:5000.  
 Your web browser will automatically connect to the server-sent event stream.  
-Open another tab, and visit 127.0.0.1:8000/hello.  
-You should get a Javascript alert in the first tab when you do so.
