@@ -5,6 +5,7 @@ import os
 #bind = '127.0.0.1:8002'
 bind = "0.0.0.0:5000"
 workers = 3
+threads = 4
 backlog = 2048
 worker_class = "gevent"
 debug = True

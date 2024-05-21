@@ -1,4 +1,4 @@
-console.log("build.v006");
+console.log("build.v007");
 
 const sse = new EventSource("/api/sse");
 sse.onopen = (event) => console.log("Connection opened")

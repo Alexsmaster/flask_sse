@@ -4,26 +4,15 @@
   <title>Flask-SSE Quickstart</title>
 </head>
 <body>
-<h1>Flask-SSE Quickstart</h1>
+  <h1>Flask-SSE Quickstart</h1>
+  <div id="001">TextDebug1</div>
 
-<div id="001">TextDebug1</div>
-
-<a href="/api/call">/api/call</a>
-<br>
-<br>
-<a href="/api/sleep">/api/sleep</a>
-<br>
-<button onclick="postJSON('/api/call','Data')">
-  /api/call
-</button>
-<!--<br>-->
-<!--<button onclick="postJSON('/api/v1/burncpu','burncpu')">Burning CPU 10sec</button>-->
-
-<button onclick="open_win()">Open Windows</button>
-<br>
-
-<button ><a href="{{ url_for('download') }}">Download</a></button>
-<script src="{{ url_for('static', filename='sse.js' )}}"></script>
+  <a href="/api/call">/api/call</a>
+  <button onclick="postJSON('/api/call','Data')">
+    /api/call
+  </button>
+  <button onclick="open_win()">Open Windows</button>
+  <script src="{{ url_for('static', filename='sse.js' )}}"></script>
 </body>
 </html>
 

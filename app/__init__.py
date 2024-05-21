@@ -1,43 +1,49 @@
 from flask import Flask, request, render_template, url_for, jsonify, Response, redirect, send_file
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
 import time
 from datetime import datetime
-# from app import announce
+from app import announce
 from app.announce import announcer, format_sse, json
 
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-app.logger.setLevel(logging.INFO)
-app.logger.debug('DEBUG in root : 00 event')
+app.logger.setLevel(logging.DEBUG)
+app.logger.debug('app created')
 
 
 @app.route('/')
 def index():
-    app.logger.info('This is an INFO message')
-    app.logger.debug('This is a DEBUG message')
-    app.logger.warning('This is a WARNING message')
-    app.logger.error('This is an ERROR message')
-    app.logger.critical('This is a CRITICAL message')
-    app.logger.exception('An exception occurred during a request.')
+    app.logger.debug('index rendered')
+    # app.logger.info('This is an INFO message')
+    # app.logger.debug('This is a DEBUG message')
+    # app.logger.warning('This is a WARNING message')
+    # app.logger.error('This is an ERROR message')
+    # app.logger.critical('This is a CRITICAL message')
+    # app.logger.exception('An exception occurred during a request.')
 
     return render_template('index.html')
 
 
 @app.route('/api/sse', methods=['GET', 'POST'])
 def apisse():
-    app.logger.debug('DEBUG in function apisse : 01 event')
+    app.logger.debug('apisse started')
     if request.headers.get('accept') == 'text/event-stream':
+        app.logger.debug('apisse enter if')
         def events_sse():
-            app.logger.debug('DEBUG in function apisse : 02 event')
+            app.logger.debug('apisse enter events_sse')
             messages = announcer.listen()
             while True:
+                time.sleep(1)
                 if not messages.empty():
-                    app.logger.debug('DEBUG in function apisse : 03 event')
+                    app.logger.debug('apisse enter events_sse _ msg not empty')
                     msg = messages.get()
                     yield msg    # blocks until a new message arrives
-                    time.sleep(0.1)
+                    # time.sleep(0.1)
+                else:
+                    app.logger.debug('apisse enter events_sse _ msg empty')
+                    yield 'no messages'  # blocks until a new message arrives
+                    # time.sleep(1)
         return Response(events_sse(), content_type='text/event-stream')
     return redirect("/")
 
@@ -54,6 +60,7 @@ def download():
 def apicall():
     if request.method == 'GET':
         data = request.data
+        app.logger.debug('apicall GET ')
         app.logger.debug(data)
         event_data = format_sse(data=f'/api/call {data}')  # json.dumps(data)
         app.logger.debug(event_data)
@@ -62,6 +69,7 @@ def apicall():
 
     elif request.method == 'POST':
         data = request.data
+        app.logger.debug('apicall POST')
         app.logger.debug(data)
         event_data = format_sse(data=f'/api/call {data}')  # json.dumps(data)
         app.logger.debug(event_data)
