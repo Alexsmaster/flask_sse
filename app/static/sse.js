@@ -1,26 +1,15 @@
 console.log("build.v007");
 
-const sse = new EventSource("/api/sse");
-sse.onopen = (event) => console.log("Connection opened")
-sse.onerror = (event) => console.log("Error:", event)
-sse.addEventListener("notice", (event) => {  console.log(event.data); });
-sse.addEventListener("update", (event) => {  console.log(event.data); });
-sse.onmessage = (event) => {
-    console.log("Debug - JS: sse - onmessage: " + event.data);
-    document.getElementById("001").innerHTML = '(/api/v1/sse) - ' + event.data + " Came at: - " + new Date().toISOString();
-}
 
-//const ssestream = new EventSource("/api/v1/stream");
-//ssestream.onopen = (event) => console.log("Connection opened")
-//ssestream.onerror = (event) => console.log("Error:", event)
-//ssestream.addEventListener("notice", (event) => {  console.log(event.data); });
-//ssestream.addEventListener("update", (event) => {  console.log(event.data); });
-//
-//ssestream.onmessage = (event) => {
-//    console.log("message " + event.data);
-//
-//    document.getElementById("003").innerHTML = '(/api/v1/stream)  - ' + event.data + " Came at: - " + new Date().toISOString();
-//}
+const ssestream = new EventSource("/api/sse");
+ssestream.onopen = (event) => console.log("Connection opened")
+ssestream.onerror = (event) => console.log("Error:", event)
+ssestream.addEventListener("notice", (event) => {  console.log(event.data); });
+ssestream.addEventListener("update", (event) => {  console.log(event.data); });
+ssestream.onmessage = (event) => {
+    console.log("message " + event.data);
+    document.getElementById("001").innerHTML = '(/api/v1/stream)  - ' + event.data + " Came at: - " + new Date().toISOString();
+}
 
 
 
@@ -32,7 +21,7 @@ async function postJSON(url, data) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        text: data + new Date().toISOString()
+        text: data + 'Button pressed at ' + new Date().toISOString()
       }),
     });
     const result = await response.json();

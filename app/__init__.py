@@ -4,13 +4,25 @@ import time
 from datetime import datetime
 from app import announce
 from app.announce import announcer, format_sse, json
+# import gevent
+# from gevent.pywsgi import WSGIServer
+# from gevent import monkey
+# monkey.patch_all()
 
 
 app = Flask(__name__)
-app.config['DEBUG'] = True
 app.logger.setLevel(logging.DEBUG)
 app.logger.debug('app created')
 
+
+def events_sse():
+    messages = announcer.listen()
+    while True:
+        if not messages.empty():  # and (time.time() % 1) <= 0.05
+            app.logger.debug(messages.qsize())
+            msg = messages.get()
+            yield msg  # blocks until a new message arrives
+            time.sleep(0.2)
 
 @app.route('/')
 def index():
@@ -25,29 +37,35 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/api/sse', methods=['GET', 'POST'])
+@app.route('/api/sse')
 def apisse():
     app.logger.debug('apisse started')
-    if request.headers.get('accept') == 'text/event-stream':
-        app.logger.debug('apisse enter if')
-        def events_sse():
-            app.logger.debug('apisse enter events_sse')
-            messages = announcer.listen()
-            while True:
-                time.sleep(1)
-                if not messages.empty():
-                    app.logger.debug('apisse enter events_sse _ msg not empty')
-                    msg = messages.get()
-                    yield msg    # blocks until a new message arrives
-                    # time.sleep(0.1)
-                else:
-                    app.logger.debug('apisse enter events_sse _ msg empty')
-                    yield 'no messages'  # blocks until a new message arrives
-                    # time.sleep(1)
-        return Response(events_sse(), content_type='text/event-stream')
-    return redirect("/")
+
+    return Response(events_sse(), content_type='text/event-stream')
 
 
+# @app.route("/stream")
+# def stream():
+#     def eventStream():
+#         while True:
+#             # Poll data from the database
+#             # and see if there's a new message
+#             if len(messages) > len(previous_messages):
+#                 yield "data:
+#                 {}\n\n
+#                 ".format(messages[len(messages)-1)])"
+#
+#
+#     return Response(eventStream(), mimetype="text/event-stream")
+
+@app.route('/counter')
+def counter():
+    while True:
+        if (time.time() % 1) == 0:
+            event_data = format_sse(data=f'/api/call {time.time()}')  # json.dumps(data)
+            app.logger.debug(event_data)
+            announcer.announce(msg=event_data)
+            time.sleep(0.9)
 
 
 @app.route('/download')
@@ -56,23 +74,21 @@ def download():
     return send_file(path, as_attachment=True)
 
 
+
 @app.route('/api/call', methods=['GET', 'POST'])
 def apicall():
     if request.method == 'GET':
-        data = request.data
         app.logger.debug('apicall GET ')
-        app.logger.debug(data)
+        data = 'Method _ GET'
         event_data = format_sse(data=f'/api/call {data}')  # json.dumps(data)
-        app.logger.debug(event_data)
         announcer.announce(msg=event_data)
         return jsonify("Done! /api/call GET")
 
     elif request.method == 'POST':
         data = request.data
-        app.logger.debug('apicall POST')
-        app.logger.debug(data)
+        # app.logger.debug('apicall POST')
+        # app.logger.debug(data)
         event_data = format_sse(data=f'/api/call {data}')  # json.dumps(data)
-        app.logger.debug(event_data)
         announcer.announce(msg=event_data)
         return jsonify("Done! /api/call POST")
     else:
@@ -104,5 +120,5 @@ def apicall():
 #
 #     return redirect("/")
 
-if __name__ == '__main__':
-    app.run('0.0.0.0', 8000, debug=True)
+# if __name__ == '__main__':
+#     app.run('0.0.0.0', 8000, debug=True)
