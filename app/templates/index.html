@@ -2,19 +2,26 @@
 <html>
 <head>
   <title>Flask-SSE Quickstart</title>
+  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel=stylesheet type=text/css>
 </head>
 <body>
+<div class="container-fluid row gap-2">
   <h1>Flask-SSE Quickstart</h1>
-  <div id="001">TextDebug1</div>
+  <div class="row">
+    <a class="btn btn-outline-secondary" href="/api/call">/api/call GET</a>
 
-  <a href="/api/call">/api/call</a>
-  <button onclick="postJSON('/api/call','Data')">
-    /api/call
-  </button>
-  <button onclick="open_win()">Open Windows</button>
-  <script src="{{ url_for('static', filename='sse.js' )}}"></script>
-  <script src="{{ url_for('static', filename='loglevel.js' )}}"></script>
+    <button class="btn btn-outline-secondary" onclick="postJSON('/api/call','Data')">
+      /api/call POST
+    </button>
 
+    <button class="btn btn-outline-dark " onclick="open_win()">Open Windows</button>
+  </div>
+  <p class="fs-4" id="001">asd1</p>
+
+</div>
+<script src="{{ url_for('static', filename='sse.js' )}}"></script>
+<script src="{{ url_for('static', filename='loglevel.js' )}}"></script>
+<script src="{{ url_for('static', filename='bootstrap.js' )}}"></script>
 </body>
 </html>
 

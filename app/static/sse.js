@@ -32,9 +32,11 @@ async function postJSON(url, data) {
 }
 
 
+
 function open_win() {
-  window.open("/", "_blank", "toolbar=no,scrollbars=no,resizable=no,top=0,left=0,width=300,height=300");
-  window.open("/", "_blank", "toolbar=no,scrollbars=no,resizable=no,top=0,left=300,width=300,height=300");
+  window.open("/", "_blank", "toolbar=no,scrollbars=no,resizable=yes,top=0,left=0,width=300,height=300");
+  window.open("/", "_blank", "toolbar=no,scrollbars=no,resizable=yes,top=0,left=300,width=300,height=300");
+
 //  window.open("http://192.168.88.221:5000/", "_blank", "toolbar=no,scrollbars=no,resizable=no,top=0,left=600,width=300,height=300");
 //  window.open("http://192.168.88.221:5000/", "_blank", "toolbar=no,scrollbars=no,resizable=no,top=0,left=900,width=300,height=300");
 //  window.open("http://192.168.88.221:5000/", "_blank", "toolbar=no,scrollbars=no,resizable=no,top=0,left=1200,width=300,height=300");
