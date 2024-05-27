@@ -24,7 +24,7 @@ def format_sse(data: str, event=None) -> str:
     msg = f'data: {data}\n\n'
     # print(msg)
     if event is not None:
-        msg = f'event: {event}\n{msg}'
+        msg = f'event: {event}\n{msg}\n\n'
     return msg
 
 

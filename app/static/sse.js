@@ -2,16 +2,17 @@ console.log("build.v007");
 
 
 const ssestream = new EventSource("/api/sse");
-ssestream.onopen = (event) => console.log("Connection opened")
-ssestream.onerror = (event) => console.log("Error:", event)
-ssestream.addEventListener("notice", (event) => {  console.log(event.data); });
-ssestream.addEventListener("update", (event) => {  console.log(event.data); });
+ssestream.onopen = (event) => console.log("Connection opened");
+ssestream.onerror = (event) => console.log("Error:", event);
 ssestream.onmessage = (event) => {
-    console.log("message " + event.data);
-    document.getElementById("001").innerHTML = '(/api/v1/stream)  - ' + event.data + " Came at: - " + new Date().toISOString();
-}
+  console.log("message ", event.data);
+    document.getElementById("001").innerHTML = '(/api/sse)  - message ' + event.data + " Came at: - " + new Date().toISOString();
+};
 
-
+ssestream.addEventListener("occur", (event) => {
+  console.log("occur ", event.data);
+  document.getElementById("002").innerHTML = '(/api/sse)  - occur ' + event.data + " Came at: - " + new Date().toISOString();
+});
 
 async function postJSON(url, data) {
   try {

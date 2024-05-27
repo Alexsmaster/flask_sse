@@ -17,6 +17,8 @@ import os
 from multiprocessing import current_process
 from threading import current_thread
 
+import socket
+
 
 
 
@@ -29,9 +31,6 @@ console_handler.setFormatter(log_formatter)
 app.logger.addHandler(console_handler)
 app.logger.info("Hi, how are you")
 
-global messages
-
-
 
 @app.route('/')
 def index():
@@ -41,14 +40,40 @@ def index():
 
 @app.route('/api/sse')
 def apisse():
-    def events_sse():
-        messages = announcer.listen()
+    # host = '127.0.0.1'
+    # port = 65432
+
+    def read_messages(file_path='messages.txt'):
+        time.sleep(1)
+        known_messages = set()
         while True:
-            msg = messages.get()
-            app.logger.debug(msg)
-            yield msg  # blocks until a new message arrives
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as f:
+
+                    messages = f.readlines()
+
+                for message in messages:
+                    message = message.strip()
+                    if message not in known_messages:
+                        app.logger.debug(f"New message: {message}")
+                        event_data = format_sse(data=('/api/callGET ' + str(message)),
+                                                event='message')  # json.dumps(data)
+                        yield event_data
+                        event_data = format_sse(data=('/api/callGET ' + str(message)),
+                                                event='occur')  # json.dumps(data)
+                        yield event_data
+                        known_messages.add(message)
+                    time.sleep(1)
+
+    # def events_sse():
+    #     messages = announcer.listen()
+    #     while True:
+    #         msg = messages.get()
+    #         app.logger.debug(msg)
+    #         yield msg  # blocks until a new message arrives
     app.logger.debug('/api/sse started')
-    return Response(events_sse(), content_type='text/event-stream')
+    # return Response(events_sse(), content_type='text/event-stream')
+    return Response(read_messages(), content_type='text/event-stream')
 
 
 @app.route('/api/call', methods=['GET', 'POST'])
