@@ -6,21 +6,25 @@ from glob import glob
 # monitor_thread = True
 
 
-TIMEOUT = 5
+# TIMEOUT = 5
+preload = True
+TIMEOUT = 0
 bind = "0.0.0.0:5000"
 # bind = "127.0.0.1:5000"
-backlog = 2048
-workers = 4
+# backlog = 2048
+workers = 15
+
+
 #threads = 4
-max_requests = 3000
-max_requests_jitter = 100
+# max_requests = 3000
+# max_requests_jitter = 100
 reload = True
 reload_extra_files = glob('app/**/*.html', recursive=True) + glob('app/**/*.css', recursive=True) + glob('app/**/*.js', recursive=True)#["app/templates/index.html", "app/static/sse.js"]
 #worker_class = 'sync'
 worker_class = 'gevent'
-worker_connections = 3000
-timeout = 3000
-keepalive = 3000
+# worker_connections = 3000
+# timeout = 3000
+# keepalive = 3000
 spew = False
 #check_config = True
 
