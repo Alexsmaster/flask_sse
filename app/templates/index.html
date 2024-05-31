@@ -1,28 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Flask-SSE Quickstart</title>
-  <link href="{{ url_for('static', filename='bootstrap.css') }}" rel=stylesheet type=text/css>
-</head>
-<body>
-<div class="container-fluid row gap-2">
-  <h1>Flask-SSE Quickstart</h1>
-  <div class="row">
-<!--    <a class="btn btn-outline-secondary" href="/api/call">/api/call GET</a>-->
+{% extends 'base.html'%}
 
-    <button class="btn btn-outline-secondary" onclick="postJSON('/api/call','')">
-      /api/call POST
-    </button>
 
-    <button class="mt-4 btn btn-outline-dark " onclick="open_win()">Open Windows</button>
-  </div>
-  <p class="  fs-4 text-wrap" id="001">Here sse should came with 'message'</p>
-<!--  <p class="fs-4" id="002">Here sse should came with 'occur'</p>-->
 
+{% block content %}
+
+<div class="row">
+  <!--    <a class="btn btn-outline-secondary" href="/api/call">/api/call GET</a>-->
+
+  <button class="btn btn-outline-secondary" onclick="postJSON('/api/call','')">
+    /api/call POST
+  </button>
+
+  <button class="mt-4 btn btn-outline-dark " onclick="open_win()">Open Windows</button>
 </div>
-<script src="{{ url_for('static', filename='sse.js' )}}"></script>
-<script src="{{ url_for('static', filename='loglevel.js' )}}"></script>
-<script src="{{ url_for('static', filename='bootstrap.js' )}}"></script>
-</body>
-</html>
-
+<p class="  fs-4 text-wrap" id="001">Here sse should came with 'message'</p>
+<!--  <p class="fs-4" id="002">Here sse should came with 'occur'</p>-->
+{% endblock %}
