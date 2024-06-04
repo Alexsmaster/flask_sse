@@ -5,7 +5,7 @@ console.log("build.v007");
 
 
 
-const ssestream = new EventSource("/api/sse");
+const ssestream = new EventSource("/stream");
 ssestream.onopen = (event) => console.log("Connection opened");
 ssestream.onerror = (event) => console.log("Error:", event);
 ssestream.onmessage = (event) => {
