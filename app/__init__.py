@@ -8,7 +8,7 @@ from datetime import datetime
 # from app import announce
 # from app.announce import format_sse #announcer
 import gevent
-import gevent.queue
+
 from gevent.pywsgi import WSGIServer
 # from gevent import monkey
 # monkey.patch_all()
@@ -34,14 +34,12 @@ app.logger.debug('app created')
 
 #rabbitmq sender env
 # logging.basicConfig()
-url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@192.168.33.60/%2f')
+url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@localhost/%2f') #178.76.253.130
 params = pika.URLParameters(url)
 params.socket_timeout = 5
 #rabbitmq sender env
 
 
-message_queue = queue.Queue()
-gevent_queue = gevent.queue.Queue()
 
 
 @app.route('/')
@@ -52,8 +50,7 @@ def index():
 
 @app.route('/api/sse')
 def apisse():
-    app.logger.debug("enter api SSE: ")
-    app.logger.debug("message_queue: " + message_queue.__repr__())
+    app.logger.debug("entered api SSE ")
     pid = os.getpid()
     thread_name = current_thread().name
     process_name = current_process().name
@@ -63,7 +60,7 @@ def apisse():
     def events_sse():
 
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host='192.168.33.60'))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 
         channel = connection.channel()
 
@@ -88,10 +85,10 @@ def apisse():
             else:
                 app.logger.debug("Q:" + queue_name + ' No message returned')
                 yield format_sse("Q:" + queue_name + ' No message returned')
-            # msg = gevent_queue.get(block=True, timeout=10)
+            
             # channel.basic_get(
             #     queue=queue_name, callback=callback, auto_ack=True)
-            time.sleep(0.05)
+            time.sleep(1)
 
 
     app.logger.debug('/api/sse started')
@@ -131,7 +128,7 @@ def apicall():
         channel_sender.basic_publish(exchange='sse_events', routing_key='', body=bodys)
         connection_sender.close()
 
-        gevent_queue.put(data)
+        
         return jsonify("/api/call POST", data)
 
     else:
@@ -146,10 +143,10 @@ def cpubound():
     start_time = time.perf_counter()
     for num in range(1000, 16000):
         get_prime_numbers(num)
-    for num in range(1000, 16000):
-        get_prime_numbers(num)
-    for num in range(1000, 16000):
-        get_prime_numbers(num)
+    # for num in range(1000, 16000):
+    #     get_prime_numbers(num)
+    # for num in range(1000, 16000):
+    #     get_prime_numbers(num)
     end_time = time.perf_counter()
 
     app.logger.debug(f"api/cpubound : Elapsed run time: {end_time - start_time} seconds")
