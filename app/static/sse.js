@@ -5,7 +5,7 @@ console.log("build.v007");
 
 
 
-const ssestream = new EventSource("/stream");
+const ssestream = new EventSource("/api/sse_stream");
 ssestream.onopen = (event) => console.log("Connection opened");
 ssestream.onerror = (event) => console.log("Error:", event);
 ssestream.onmessage = (event) => {
@@ -17,6 +17,25 @@ ssestream.onmessage = (event) => {
     const nowTimestamp_mmssMS = `${minutes}:${seconds}:${millis}`
     document.getElementById("001").innerHTML = 'JS|sse: ' + event.data + " Came at: - " + nowTimestamp_mmssMS;
 };
+ssestream.addEventListener("data", (event) => {
+ console.log("data ", event.data);
+ const nowTimestamp = new Date();
+ const minutes = nowTimestamp.getMinutes().toString().padStart(2, '0');
+ const seconds = nowTimestamp.getSeconds().toString().padStart(2, '0');
+ const millis = nowTimestamp.getMilliseconds().toString().padStart(3, '0');
+ const nowTimestamp_mmssMS = `${minutes}:${seconds}:${millis}`
+ document.getElementById("001").innerHTML =event.data + " Came at: - " + nowTimestamp_mmssMS;
+});
+ssestream.addEventListener("greeting", (event) => {
+  console.log("event - greeting ", event.data);
+  const nowTimestamp = new Date();
+  const minutes = nowTimestamp.getMinutes().toString().padStart(2, '0');
+  const seconds = nowTimestamp.getSeconds().toString().padStart(2, '0');
+  const millis = nowTimestamp.getMilliseconds().toString().padStart(3, '0');
+  const nowTimestamp_mmssMS = `${minutes}:${seconds}:${millis}`
+  document.getElementById("001").innerHTML = event.data + " Came at: - " + nowTimestamp_mmssMS;
+ });
+
 //
 //let now = new Date();
 //let minutes = now.getMinutes().toString().padStart(2, '0');
@@ -28,10 +47,7 @@ ssestream.onmessage = (event) => {
 
 
 
-//ssestream.addEventListener("occur", (event) => {
-//  console.log("occur ", event.data);
-//  document.getElementById("002").innerHTML = '(/api/sse)  - occur ' + event.data + " Came at: - " + new Date().toISOString().split('T')[1].split('.')[0];
-//});
+
 
 async function postJSON(url, data) {
   try {
