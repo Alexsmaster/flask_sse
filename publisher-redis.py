@@ -9,5 +9,5 @@ r = redis.Redis(
 
 while True:
     message = input("Enter the message you want to send to soilders: ")
-
-    r.publish("greetings", message)
+    message = "\n" + message + "\n\n"
+    r.publish(type="message", channel='sse', message=message)

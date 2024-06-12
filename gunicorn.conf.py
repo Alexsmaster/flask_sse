@@ -4,16 +4,15 @@ from glob import glob
 
 # GEVENT_MONITOR_THREAD_ENABLE = True
 # monitor_thread = True
-
-
 # TIMEOUT = 5
 # preload = True
 TIMEOUT = 600
 bind = "0.0.0.0:5000"
 # bind = "127.0.0.1:5000"
 # backlog = 2048
-workers = 3
-#threads = 4
+workers = 4
+
+# threads = 4
 # max_requests = 3000
 # max_requests_jitter = 100
 reload = True
@@ -27,18 +26,16 @@ spew = False
 #check_config = True
 
 errorlog = '-'
-loglevel = 'debug'
+loglevel = 'info'
 accesslog = '-'
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 logfile = 'log.txt'
-
-
 proc_name = 'worker'
 
 
 def post_fork(server, worker):
-    server.log.info("Worker spawned (pid: %s)", worker.pid)
-
+    # server.log.info("Worker spawned (pid: %s)", worker.pid)
+    pass
 
 def pre_fork(server, worker):
     pass
@@ -46,8 +43,8 @@ def pre_fork(server, worker):
 # def pre_exec(server):
 #     server.log.info("Forked child, re-executing.")
 #
-# def when_ready(server):
-#     server.log.info("Server is ready. Spawning workers")
+def when_ready(server):
+    server.log.info("Server is ready. Spawning workers")
 #
 # def worker_int(worker):
 #     worker.log.info("worker received INT or QUIT signal")
