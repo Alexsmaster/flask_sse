@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config["REDIS_URL"] = "redis://localhost"
 app.register_blueprint(sse, url_prefix='/api/sse_stream')
 
-# app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(logging.DEBUG)
 
 # pid = os.getpid()
 # thread_name = current_thread().name
@@ -30,7 +30,7 @@ def apicall():
     pid = os.getpid()
     thread_name = current_thread().name
     process_name = current_process().name
-    # app.logger.debug(f"cpubound: pid - {pid}, thread_name - {thread_name}, process_name - {process_name}")
+    app.logger.debug(f"cpubound: pid - {pid}, thread_name - {thread_name}, process_name - {process_name}")
     data = request.get_json()['text']
     sse.publish(str(f"pid - {pid}, thread_name - {thread_name}, process_name - {process_name}" + data))
     return jsonify("/api/call POST", data)
