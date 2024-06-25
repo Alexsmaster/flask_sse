@@ -27,10 +27,9 @@ def index():
 
 @app.route('/api/call', methods=['POST'])
 def apicall():
-    # pid = os.getpid()
-    # thread_name = current_thread().name
-    # process_name = current_process().name
-
+    pid = os.getpid()
+    thread_name = current_thread().name
+    process_name = current_process().name
     # app.logger.debug(f"cpubound: pid - {pid}, thread_name - {thread_name}, process_name - {process_name}")
     data = request.get_json()['text']
     sse.publish(str(f"pid - {pid}, thread_name - {thread_name}, process_name - {process_name}" + data))
