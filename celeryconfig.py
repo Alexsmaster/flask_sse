@@ -9,4 +9,5 @@
 #
 # task = long_running_task.apply_async()
 #
+
 # celery = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
