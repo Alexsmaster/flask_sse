@@ -3,8 +3,8 @@ import logging
 import time
 from flask_sse import sse
 import os
-# from multiprocessing import current_process
-# from threading import current_thread
+from multiprocessing import current_process
+from threading import current_thread
 
 
 app = Flask(__name__)
