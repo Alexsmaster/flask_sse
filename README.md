@@ -6,6 +6,8 @@ Sample server for alerting clients with minimal delay.
 sudo apt install git python3.10-venv redis-server -y
 ## install only redis 
 sudo apt install redis-server -y
+
+
 git clone https://github.com/Alexsmaster/flask_sse.git
 cd flask_sse  
 git checkout with-redis
