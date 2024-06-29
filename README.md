@@ -22,3 +22,9 @@ gunicorn 'app:app'
 Open your web browser, and visit 127.0.0.1:5000.  
 Your web browser will automatically connect to the server-sent event stream.  
 
+
+
+
+# tricks for pip 
+cat requirements.txt | xargs -n 1 pip install
+cat requirements.txt | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install
