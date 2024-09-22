@@ -61,14 +61,14 @@ def cpubound():
 def report_success(job, connection, result, *args, **kwargs):
     print(result)
     app.logger.debug(str(result) + f" hey, iam done {job.get_id}")
-    sse.publish(f"Job is done, result = {result}, job id = {job.get_id}")
+    # sse.publish(f"Job is done, result = {result}, job id = {job.get_id}")
     # return render_template('cpubound.html', timedelta=result)
     # pass
 
 
 def cpu_bound_prime_numbers():
     start_time = time.perf_counter()
-    for num in range(1000, 2000):         # i7-8700k deals with it in  12.82s with debug range(1000, 16000)
+    for num in range(1000, 16000):         # i7-8700k deals with it in  12.82s with debug range(1000, 16000)
         get_prime_numbers(num)
     end_time = time.perf_counter()
     timedelta = end_time - start_time

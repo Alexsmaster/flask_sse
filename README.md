@@ -18,6 +18,8 @@ python3 -m venv venv && source venv/bin/activate && pip install -r requirements.
 
 cd ~/flask_sse && source venv/bin/activate  
 gunicorn 'app:app' 
+rq worker app-tasks
+
 
 Open your web browser, and visit 127.0.0.1:5000.  
 Your web browser will automatically connect to the server-sent event stream.  
