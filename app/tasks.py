@@ -11,7 +11,7 @@ def example(htmltext):
     #     job.meta['progress'] = 100.0 * i / seconds
     #     job.save_meta()
     #     print(i)
-    #     time.sleep(1)
+    #     time.sleep(1) #123
 
     result = cpu_bound_prime_numbers()
     job.meta['progress'] = 100
