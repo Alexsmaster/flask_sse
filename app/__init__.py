@@ -1,83 +1,174 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, \
+            url_for, jsonify, Response, redirect, send_file, g
 import logging
+from logging import getLogger, getLevelName, Formatter, StreamHandler
 import time
-from flask_sse import sse
+#from gevent import time
+from datetime import datetime
+# from app import announce
+# from app.announce import format_sse #announcer
+import gevent
+
+from gevent.pywsgi import WSGIServer
+# from gevent import monkey
+# monkey.patch_all()
+
+import pika
+import queue
 import os
+import threading
 from multiprocessing import current_process
 from threading import current_thread
-from redis import Redis
-import rq
-from flask_weasyprint import HTML, render_pdf
+
+
+import socket
+
 
 app = Flask(__name__)
-app.config["REDIS_URL"] = "redis://localhost"
-app.register_blueprint(sse, url_prefix='/api/sse_stream')
-
 app.logger.setLevel(logging.DEBUG)
+app.logger.debug('app created')
 
-redis = Redis.from_url(app.config['REDIS_URL'])
-task_queue = rq.Queue('app-tasks', connection=redis)
+
+
+
+
+#rabbitmq sender env
+# logging.basicConfig()
+url = os.environ.get('CLOUDAMQP_URL', 'amqp://guest:guest@localhost/%2f') #178.76.253.130
+params = pika.URLParameters(url)
+params.socket_timeout = 5
+#rabbitmq sender env
+
+
 
 
 @app.route('/')
 def index():
-    # app.logger.debug('def index():')
+    app.logger.debug('def index():')
     return render_template('index.html')
 
 
-@app.route('/api/call', methods=['POST'])
+@app.route('/api/sse')
+def apisse():
+    app.logger.debug("entered api SSE ")
+    pid = os.getpid()
+    thread_name = current_thread().name
+    process_name = current_process().name
+    app.logger.debug(f"pid = {pid} - {process_name} - {thread_name}")
+
+
+    def events_sse():
+
+
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+
+        channel = connection.channel()
+
+        channel.exchange_declare(exchange='sse_events', exchange_type='fanout')
+        result = channel.queue_declare(queue='', exclusive=True)
+        queue_name = result.method.queue
+        app.logger.debug("rabbitMQ Queue name: " + queue_name)
+        channel.queue_bind(exchange='sse_events', queue=queue_name)
+
+        # def callback(ch, method, properties, body):
+        #     yield format_sse(str(body))
+
+
+
+        while True:
+            method_frame, header_frame, body = channel.basic_get(queue_name)
+            if method_frame:
+                app.logger.debug("rabbitMQ Queue name: " + queue_name + " With: " + str(method_frame) + " ; " + str(header_frame) + " : " + str(body))
+                channel.basic_ack(method_frame.delivery_tag)
+                yield format_sse("Q:" + queue_name + str(body))
+                # channel.basic_ack(method_frame.delivery_tag)
+            else:
+                app.logger.debug("Q:" + queue_name + ' No message returned')
+                yield format_sse("Q:" + queue_name + ' No message returned')
+            
+            # channel.basic_get(
+            #     queue=queue_name, callback=callback, auto_ack=True)
+            time.sleep(1)
+
+
+    app.logger.debug('/api/sse started')
+    resp = Response(
+        events_sse(),
+        mimetype='text/event-stream'
+    )
+    resp.headers['X-Accel-Buffering'] = 'no'
+    resp.headers['Cache-Control'] = 'no-cache'
+    return resp
+
+
+
+
+# we recieve post request and writing data to file. responding is just echo
+@app.route('/api/call', methods=['GET', 'POST'])
 def apicall():
-    pid = os.getpid()
-    thread_name = current_thread().name
-    process_name = current_process().name
-    app.logger.debug(f"apicall: pid - {pid}, thread_name - {thread_name}, process_name - {process_name} ")
-    data = request.get_json()['text']
-    sse.publish(str(f"apicall - {pid}, thread_name - {thread_name}, process_name - {process_name} " + data + " "))
-    return jsonify("/api/call POST", data)
+    if request.method == 'GET':
+        return jsonify("/api/call GET: nothing to do ")
+
+    elif request.method == 'POST':
+        data = request.get_json()['text'] #just because text field is sent from the client
+        # app.logger.debug(data)
+        # with open(file_path, 'a') as f:
+        #     f.write(data + '\n')
 
 
-@app.route('/api/cpubound', methods=['POST'])
-def apicpubound():
-    data = request.get_json()['text']
-    job = task_queue.enqueue('app.tasks.example', on_success=rq.Callback(report_success))
-    job_id = job.get_id()
-    return jsonify("/api/call POST", data, job_id)
+
+        connection_sender = pika.BlockingConnection(params)  # Connect to CloudAMQP
+        channel_sender = connection_sender.channel()  # start a channel
+        # channel_sender.queue_declare(queue='pdfprocess')  # Declare a queue
+        channel_sender.exchange_declare(exchange='sse_events',
+                                 exchange_type='fanout')
+
+        # Message to send to rabbitmq
+        bodys = 'data ke ' + data #str()
+        channel_sender.basic_publish(exchange='sse_events', routing_key='', body=bodys)
+        connection_sender.close()
+
+        
+        return jsonify("/api/call POST", data)
+
+    else:
+        pass
+    return jsonify("/api/call its not GET or POST request!!")
+    # return '', 204
 
 
-@app.route('/api/cpubound_get')
+@app.route('/api/cpubound')
 def cpubound():
-    pid = os.getpid()
-    thread_name = current_thread().name
-    process_name = current_process().name
-    app.logger.debug(f"cpubound: pid - {pid}, thread_name - {thread_name}, process_name - {process_name} ")
-    done_with_thread = f"cpubound: pid - {pid}, thread_name - {thread_name}, process_name - {process_name} "
-    result = cpu_bound_prime_numbers()
-
-    job = task_queue.enqueue('app.tasks.example', on_success=rq.Callback(report_success))
-    job.get_id()
-    return render_template('cpubound.html', timedelta=result, done_with_thread=done_with_thread)
-
-
-def report_success(job, connection, result, *args, **kwargs):
-    print(result)
-    app.logger.debug(str(result) + f" hey, iam done {job.get_id}")
-    # sse.publish(f"Job is done, result = {result}, job id = {job.get_id}")
-    # return render_template('cpubound.html', timedelta=result)
-    # pass
-
-
-def cpu_bound_prime_numbers():
+    # i7-8700k deals with it in  12.82s with debug range(1000, 16000)
     start_time = time.perf_counter()
-    for num in range(1000, 16000):         # i7-8700k deals with it in  12.82s with debug range(1000, 16000)
+    for num in range(1000, 16000):
         get_prime_numbers(num)
+    # for num in range(1000, 16000):
+    #     get_prime_numbers(num)
+    # for num in range(1000, 16000):
+    #     get_prime_numbers(num)
     end_time = time.perf_counter()
-    timedelta = end_time - start_time
-    app.logger.debug(f" cpu_burning_function : Elapsed run time: {timedelta} seconds ")
-    return timedelta
+
+    app.logger.debug(f"api/cpubound : Elapsed run time: {end_time - start_time} seconds")
+    # with open(file_path, 'a') as f:
+    #     f.write(f"api/cpubound : Elapsed run time: {end_time - start_time} seconds" + '\n')
+    return render_template('cpubound.html', timedelta=end_time - start_time)
+
+
+# @app.route('/download')
+# def download():
+#     path = 'file'
+#     return send_file(path, as_attachment=True)
 
 
 def get_prime_numbers(num):
     # cpu-bound
+
+    pid = os.getpid()
+    thread_name = current_thread().name
+    process_name = current_process().name
+    app.logger.debug(f"{pid} - {process_name} - {thread_name}")
+
     numbers = []
 
     prime = [True for i in range(num + 1)]
@@ -97,3 +188,11 @@ def get_prime_numbers(num):
             numbers.append(p)
 
     return numbers[-1]
+
+
+def format_sse(data: str, event=None) -> str:
+    msg = f'data: {data}\n\n'
+    # print(msg)
+    if event is not None:
+        msg = f'event: {event}\n{msg}\n\n'
+    return msg

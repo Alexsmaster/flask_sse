@@ -4,10 +4,9 @@ Sample server for alerting clients with minimal delay.
 # Install
 ## install with python, git
 sudo apt install git python3.10-venv redis-server -y
+sudo apt install git python3.12-venv redis-server -y
 ## install only redis 
 sudo apt install redis-server -y
-
-
 git clone https://github.com/Alexsmaster/flask_sse.git
 cd flask_sse  
 git checkout with-redis
@@ -24,9 +23,3 @@ rq worker app-tasks
 Open your web browser, and visit 127.0.0.1:5000.  
 Your web browser will automatically connect to the server-sent event stream.  
 
-
-
-
-# tricks for pip 
-cat requirements.txt | xargs -n 1 pip install
-cat requirements.txt | sed -e '/^\s*#.*$/d' -e '/^\s*$/d' | xargs -n 1 pip install

@@ -3,9 +3,10 @@ import time
 from app import cpu_bound_prime_numbers
 
 
-def example():
+def example(htmltext):
     job = get_current_job()
     print('Starting task')
+    print(f'htmltext is : {htmltext}')
     # for i in range(seconds):
     #     job.meta['progress'] = 100.0 * i / seconds
     #     job.save_meta()
@@ -16,4 +17,3 @@ def example():
     job.meta['progress'] = 100
     job.save_meta()
     print('Task completed')
-    return result
