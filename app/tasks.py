@@ -1,0 +1,19 @@
+from rq import get_current_job
+import time
+from app import cpu_bound_prime_numbers
+
+
+def example(htmltext):
+    job = get_current_job()
+    print('Starting task')
+    print(f'htmltext is : {htmltext}')
+    # for i in range(seconds):
+    #     job.meta['progress'] = 100.0 * i / seconds
+    #     job.save_meta()
+    #     print(i)
+    #     time.sleep(1)
+
+    result = cpu_bound_prime_numbers()
+    job.meta['progress'] = 100
+    job.save_meta()
+    print('Task completed')
